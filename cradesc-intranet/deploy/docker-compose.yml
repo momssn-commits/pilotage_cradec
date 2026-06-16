@@ -1,0 +1,35 @@
+# Déploiement derrière Traefik (détecté sur 187.124.52.164).
+# Adaptez : DOMAINE, le nom du réseau Traefik et le nom du certresolver.
+#
+#   DOMAINE=intranet.cradesc.org docker compose -f deploy/docker-compose.yml up -d --build
+#
+services:
+  cradesc-intranet:
+    build:
+      context: ..                      # racine cradesc-intranet/ (pour copier hosting/)
+      dockerfile: deploy/Dockerfile
+    image: cradesc-intranet:latest
+    container_name: cradesc-intranet
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      # --- Routeur HTTPS (remplacez le domaine) ---
+      - "traefik.http.routers.cradesc.rule=Host(`${DOMAINE:-intranet.cradesc.org}`)"
+      - "traefik.http.routers.cradesc.entrypoints=websecure"
+      - "traefik.http.routers.cradesc.tls=true"
+      - "traefik.http.routers.cradesc.tls.certresolver=${CERTRESOLVER:-letsencrypt}"
+      - "traefik.http.services.cradesc.loadbalancer.server.port=80"
+      # --- Redirection HTTP -> HTTPS ---
+      - "traefik.http.routers.cradesc-http.rule=Host(`${DOMAINE:-intranet.cradesc.org}`)"
+      - "traefik.http.routers.cradesc-http.entrypoints=web"
+      - "traefik.http.routers.cradesc-http.middlewares=cradesc-redirect"
+      - "traefik.http.middlewares.cradesc-redirect.redirectscheme.scheme=https"
+
+# Le réseau Traefik existe déjà sur le serveur : on le déclare "externe".
+# Vérifiez son nom réel avec :  docker network ls
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:-traefik}
