@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRADESC — Intranet</title>
+<meta name="theme-color" content="#3A241D">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles/shell.css">
+</head>
+<body>
+<div id="app"></div>
+<div class="appframe" id="appFrame">
+  <div class="af-bar">
+    <button class="af-waffle" id="afWaffle" title="Vos applications"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="1.7"/><circle cx="12" cy="5" r="1.7"/><circle cx="19" cy="5" r="1.7"/><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/><circle cx="5" cy="19" r="1.7"/><circle cx="12" cy="19" r="1.7"/><circle cx="19" cy="19" r="1.7"/></svg></button>
+    <button class="af-home" id="afHome"><img id="afLogo" alt="CRADESC"><span>Intranet</span></button>
+    <span class="af-sep">›</span>
+    <div class="af-title" id="afTitle"></div>
+    <div class="af-spacer"></div>
+    <div class="af-quick" id="afQuick"></div>
+    <button class="af-back" id="afBack"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Retour à l'intranet</button>
+    <span class="af-prof" id="afProf"></span>
+    <div class="af-launcher" id="afLauncher"></div>
+  </div>
+  <iframe class="af-iframe" id="afIframe" title="Plateforme"></iframe>
+</div>
+<div class="gmodal-scrim" id="gmodal"></div>
+<div class="nav-scrim" id="navScrim"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script type="module" src="app/shell.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js").catch(() => {}));
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Dépendances
+node_modules/
+**/node_modules/
+
+# Firebase
+.firebase/
+*-debug.log
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Secrets / clés de service — NE JAMAIS committer
+*serviceAccount*.json
+*service-account*.json
+.env
+.env.*
+.runtimeconfig.json
+
+# Système / éditeurs
+.DS_Store
+*.swp
+.idea/
+.vscode/

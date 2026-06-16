@@ -1,0 +1,109 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    //  CRADESC — Règles de sécurité Firestore
+    //  Les droits reposent sur les "custom claims" portés par le jeton
+    //  Google Sign-In (voir functions/src/roles.js).
+    //  Rôles : admin · directrice · dir_prog · chef_projet · collaborateur
+    // ============================================================
+
+    function signedIn() {
+      return request.auth != null
+        && request.auth.token.email.matches('.*@cradesc[.]org');
+    }
+    function role() { return request.auth.token.role; }
+    function hasRole(roles) { return signedIn() && (role() in roles); }
+
+    // Lecture : tout agent connecté du domaine.
+    // Écriture sensible : réservée et/ou passée par Cloud Functions.
+
+    // ---- Référentiels (agents, programmes, projets) : lecture tous,
+    //      écriture admin uniquement ----
+    match /agents/{id} {
+      allow read: if signedIn();
+      allow write: if hasRole(['admin']);
+    }
+    match /programmes/{id} {
+      allow read: if signedIn();
+      allow write: if hasRole(['admin', 'directrice']);
+    }
+    match /projets/{id} {
+      allow read: if signedIn();
+      allow write: if hasRole(['admin', 'directrice', 'dir_prog']);
+    }
+
+    // ---- Pilotage : activités, tâches, et revue (réunions / décisions /
+    //      actions / points de vigilance) ----
+    match /activites/{id} {
+      allow read: if signedIn();
+      allow write: if hasRole(['admin', 'directrice', 'dir_prog', 'chef_projet']);
+    }
+    match /taches/{id} {
+      allow read: if signedIn();
+      // chacun peut créer/mettre à jour ses tâches ; arbitrage par les chefs
+      allow create, update: if signedIn();
+      allow delete: if hasRole(['admin', 'directrice', 'dir_prog', 'chef_projet']);
+    }
+    match /reunions/{id}   { allow read: if signedIn(); allow write: if signedIn(); }
+    match /decisions/{id}  { allow read: if signedIn(); allow write: if hasRole(['admin','directrice','dir_prog']); }
+    match /actions/{id}    { allow read: if signedIn(); allow write: if signedIn(); }
+    match /pointsVigilance/{id} { allow read: if signedIn(); allow write: if signedIn(); }
+
+    // ---- Validation des TdR ----
+    match /tdr/{id} {
+      allow read: if signedIn();
+      allow create, update: if signedIn();
+      // la transition de validation passe par une Cloud Function
+    }
+    match /livrables/{id} { allow read: if signedIn(); allow write: if signedIn(); }
+
+    // ---- Achats ----
+    match /requisitions/{id} {
+      allow read: if signedIn();
+      allow create, update: if signedIn();
+      // les transitions de circuit (par seuils) passent par une Cloud Function
+    }
+    match /bonsCommande/{id} {
+      allow read: if signedIn();
+      allow write: if false; // créés/modifiés uniquement par Cloud Function
+    }
+
+    // ---- Demandes de paiement ----
+    match /demandesPaiement/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn();
+      // ordonnancement / décaissement : Cloud Function uniquement
+      allow update, delete: if false;
+    }
+
+    // ---- Ordres de mission & avances ----
+    match /ordresMission/{id} {
+      allow read: if signedIn();
+      allow create, update: if signedIn();
+    }
+    match /avances/{id} {
+      allow read: if signedIn();
+      allow write: if false; // passerelle avance → paiement : Cloud Function
+    }
+
+    // ---- Budget / engagements (consolidation) : lecture seule côté client ----
+    match /engagements/{id} {
+      allow read: if signedIn();
+      allow write: if false; // écrit par les Cloud Functions transactionnelles
+    }
+
+    // ---- Journal d'audit : ajout seulement, jamais de modification ----
+    match /audit/{id} {
+      allow read: if hasRole(['admin', 'directrice']);
+      allow create: if signedIn();
+      allow update, delete: if false;
+    }
+
+    // Tout le reste est refusé par défaut.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

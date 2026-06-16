@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cradesc",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "49643", "--directory", "/Users/technique1/Pilotage_cradec/cradesc-intranet/hosting"],
+      "port": 49643
+    }
+  ]
+}

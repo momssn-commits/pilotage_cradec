@@ -1,0 +1,656 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CRADESC — Demandes de paiement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Inter:wght@400;450;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --acajou:#4A2E25;--acajou-d:#3A241D;--acajou-l:#5E3D31;
+  --taupe:#7A6962;--taupe-2:#A2948D;
+  --paper:#F4F0EB;--surface:#FFFFFF;--surface-2:#FBF8F4;
+  --parch:#EBE1D6;--parch-2:#C9BCAF;
+  --line:#E7DED4;--line-2:#F0E9E0;
+  --ink:#2A2018;--ink-soft:#6B5D52;--ink-faint:#9A8C7F;
+  --green:#4E6B52;--green-bg:#EAF0EA;--green-line:#CFE0D0;
+  --ocre:#9A6B22;--ocre-bg:#F7EFE0;
+  --oxblood:#9B3B2E;--oxblood-bg:#F6E8E4;
+  --slate:#5E5A74;--slate-bg:#ECEBF1;
+  --blue:#3a5a78;--blue-bg:#E8EEF3;
+  --accent:#BE7B57;
+  --shadow:0 1px 2px rgba(74,46,37,.04),0 2px 8px rgba(74,46,37,.05);
+  --shadow-lg:0 12px 40px rgba(74,46,37,.16);
+  --r:14px;
+  --sans:'Inter',system-ui,sans-serif;--serif:'Spectral',Georgia,serif;--mono:'IBM Plex Mono',monospace;
+}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--mono)}
+.faint{color:var(--ink-faint)}
+
+.shell{display:grid;grid-template-columns:246px 1fr;min-height:100vh}
+.sidebar{background:var(--acajou-d);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.sb-brand{display:flex;align-items:center;gap:12px;padding:20px 18px 16px}
+.sb-logo{width:42px;height:42px;border-radius:11px;background:#fff;display:grid;place-items:center;overflow:hidden;flex:none}
+.sb-logo img{width:34px;height:34px;object-fit:contain}
+.sb-brand b{font-size:16px;font-weight:700;letter-spacing:.01em;line-height:1.1}
+.sb-brand span{font-size:10px;letter-spacing:.15em;color:rgba(255,255,255,.5)}
+.sb-nav{flex:1;overflow-y:auto;padding:8px 12px}
+.nav-sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.32);padding:16px 12px 6px}
+.navit{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:9px;color:#d8c9bf;font-size:13.5px;font-weight:500;width:100%;text-align:left;transition:.12s}
+.navit:hover{background:rgba(255,255,255,.06);color:#fff}
+.navit.on{background:var(--acajou-l);color:#fff}
+.navit svg{width:18px;height:18px;flex:none}
+.navit .nb{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:1px 7px;min-width:18px;text-align:center}
+.sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.08)}
+.me-menu{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:11px;width:100%;text-align:left}
+.me-menu:hover{background:rgba(255,255,255,.06)}
+.me-av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:13px;flex:none}
+.me-menu b{font-size:13px;font-weight:600;color:#fff;display:block;line-height:1.2}
+.me-menu span{font-size:11px;color:rgba(255,255,255,.55)}
+
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;gap:16px;padding:15px 28px;background:var(--surface-2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.tb-t h1{font-family:var(--serif);font-size:21px;font-weight:600;line-height:1.1}
+.tb-t p{font-size:12.5px;color:var(--ink-faint)}
+.tb-spacer{flex:1}
+.tb-search{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:9px 13px;color:var(--ink-faint);width:240px}
+.tb-search input{flex:1;border:none;outline:none;background:none;font-size:13.5px;color:var(--ink)}
+.btn-primary{display:flex;align-items:center;gap:8px;background:var(--acajou);color:#fff;border-radius:11px;padding:11px 17px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow)}
+.btn-primary:hover{background:var(--acajou-d)}
+.btn-ghost{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink-soft)}
+.btn-ghost:hover{border-color:var(--taupe-2);color:var(--acajou)}
+
+.view{flex:1;padding:26px 30px 60px;max-width:1320px;width:100%;margin:0 auto}
+.page-head{margin-bottom:22px}
+.page-head h2{font-family:var(--serif);font-size:25px;font-weight:600}
+.page-head p{font-size:14px;color:var(--ink-soft);margin-top:4px}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:17px 19px}
+.kpi-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.kpi-l{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint)}
+.kpi-ic{width:33px;height:33px;border-radius:9px;display:grid;place-items:center}
+.kpi-n{font-size:30px;font-weight:700;line-height:1;font-family:var(--serif)}
+.kpi-s{font-size:12px;color:var(--ink-faint);margin-top:7px}
+
+.grid2{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}
+@media(max-width:1000px){.grid2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.panel-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line-2)}
+.panel-h h3{font-family:var(--serif);font-size:16px;font-weight:600}
+.panel-b{padding:8px 20px 14px}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:20px;padding:3px 10px;white-space:nowrap}
+.pill.green{background:var(--green-bg);color:var(--green)}
+.pill.ocre{background:var(--ocre-bg);color:var(--ocre)}
+.pill.ox{background:var(--oxblood-bg);color:var(--oxblood)}
+.pill.slate{background:var(--slate-bg);color:var(--slate)}
+.pill.blue{background:var(--blue-bg);color:var(--blue)}
+.pill.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);padding:11px 14px;border-bottom:1px solid var(--line)}
+.tbl td{padding:13px 14px;border-bottom:1px solid var(--line-2);font-size:13.5px;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr{cursor:pointer;transition:.1s}
+.tbl tbody tr:hover{background:var(--surface-2)}
+.tbl .num{font-family:var(--mono);text-align:right;white-space:nowrap}
+.req-id{font-family:var(--mono);font-size:12px;color:var(--ink-soft);font-weight:600}
+.av{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-size:10.5px;font-weight:600;vertical-align:middle}
+.cellwho{display:flex;align-items:center;gap:8px}
+
+.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.filters select,.filters input{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 11px;font-size:13px;color:var(--ink)}
+.seg{display:flex;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{padding:6px 13px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+.seg button.on{background:var(--surface);color:var(--acajou);box-shadow:var(--shadow)}
+
+/* mini circuit progress in table */
+.circ-mini{display:flex;align-items:center;gap:4px}
+.circ-dot{width:8px;height:8px;border-radius:50%;background:var(--parch-2)}
+.circ-dot.ok{background:var(--green)}
+.circ-dot.cur{background:var(--ocre);box-shadow:0 0 0 3px var(--ocre-bg)}
+.circ-dot.no{background:var(--oxblood)}
+
+/* budget bar */
+.bbar{height:9px;border-radius:6px;background:var(--parch);overflow:hidden}
+.bbar i{display:block;height:100%;border-radius:6px}
+.budg-row{padding:12px 0;border-bottom:1px solid var(--line-2)}
+.budg-row:last-child{border-bottom:none}
+.budg-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;font-size:13px}
+.budg-top b{font-weight:600}
+.budg-meta{font-size:11.5px;color:var(--ink-faint);font-family:var(--mono);margin-top:5px}
+
+/* queue cards (validations) */
+.qcard{display:flex;align-items:center;gap:16px;padding:15px 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow);margin-bottom:12px}
+.qcard .q-ic{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;background:var(--ocre-bg);color:var(--ocre);flex:none}
+.qcard .q-m{flex:1;min-width:0}
+.qcard .q-t{font-size:14.5px;font-weight:600}
+.qcard .q-s{font-size:12.5px;color:var(--ink-faint);margin-top:2px}
+.qcard .q-amt{font-family:var(--mono);font-weight:600;font-size:14px;white-space:nowrap}
+.qcard .q-acts{display:flex;gap:7px;flex:none}
+.btn-ok{display:flex;align-items:center;gap:6px;background:var(--green);color:#fff;border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:600}
+.btn-ok:hover{filter:brightness(1.06)}
+.btn-no{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);color:var(--oxblood);border-radius:9px;padding:9px 13px;font-size:12.5px;font-weight:600}
+.btn-no:hover{background:var(--oxblood-bg);border-color:var(--oxblood)}
+.empty{text-align:center;padding:46px 20px;color:var(--ink-faint)}
+.empty .e-ic{width:54px;height:54px;border-radius:14px;background:var(--surface-2);display:grid;place-items:center;margin:0 auto 14px;color:var(--taupe-2)}
+.empty b{display:block;font-size:15px;color:var(--ink);font-weight:600;margin-bottom:4px}
+
+/* fournisseurs */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px}
+.fcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:18px}
+.fcard-h{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.fcard-ic{width:42px;height:42px;border-radius:11px;background:var(--parch);display:grid;place-items:center;color:var(--acajou);font-weight:700;font-family:var(--serif);flex:none}
+.fcard b{font-size:14.5px;font-weight:600}
+.fcard .fc-cat{font-size:12px;color:var(--ink-faint)}
+.fcard-meta{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-soft)}
+.fcard-meta .fm{display:flex;justify-content:space-between;gap:10px}
+.stars{color:var(--ocre);font-size:12px}
+
+/* policy */
+.policy-step{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--line-2)}
+.policy-step:last-child{border-bottom:none}
+.ps-amt{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--acajou);width:190px;flex:none}
+.ps-chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ps-node{display:flex;align-items:center;gap:7px;background:var(--surface-2);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12.5px;font-weight:600}
+.ps-arrow{color:var(--taupe-2)}
+
+/* DRAWER */
+.scrim{position:fixed;inset:0;background:rgba(40,28,22,.42);opacity:0;pointer-events:none;transition:.2s;z-index:40}
+.scrim.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100vh;width:560px;max-width:94vw;background:var(--surface);box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .24s;z-index:50;overflow-y:auto}
+.drawer.open{transform:none}
+.dw-head{padding:20px 24px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
+.dw-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dw-key{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink-soft);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:2px 8px}
+.dw-x{margin-left:auto;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--ink-soft)}
+.dw-x:hover{background:var(--surface-2);color:var(--acajou)}
+.dw-title{font-family:var(--serif);font-size:22px;font-weight:600;margin-top:12px;line-height:1.25}
+.dw-sub{font-size:12.5px;color:var(--ink-faint);margin-top:5px}
+.dw-body{padding:18px 24px 40px}
+.section{padding:16px 0;border-bottom:1px solid var(--line-2)}
+.section:last-child{border-bottom:none}
+.sec-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);margin-bottom:12px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:13.5px}
+.kv .k{color:var(--ink-soft)}
+.kv .v{font-weight:500;text-align:right}
+
+/* budget control widget */
+.budgctl{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface-2)}
+.budgctl.ok{border-color:var(--green-line);background:var(--green-bg)}
+.budgctl.no{border-color:#e7c9c2;background:var(--oxblood-bg)}
+.bc-top{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;margin-bottom:9px}
+.bc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px}
+.bc-grid .bcg b{font-family:var(--mono);display:block;font-size:13.5px}
+.bc-grid .bcg span{color:var(--ink-soft);font-size:11px}
+
+/* lignes table */
+.lignes{width:100%;border-collapse:collapse;font-size:13px}
+.lignes th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);padding:7px 8px;border-bottom:1px solid var(--line)}
+.lignes td{padding:9px 8px;border-bottom:1px solid var(--line-2)}
+.lignes .num{font-family:var(--mono);text-align:right;white-space:nowrap}
+.lignes tfoot td{font-weight:700;border-top:2px solid var(--line);border-bottom:none;padding-top:11px}
+
+/* circuit stepper */
+.stepper{display:flex;flex-direction:column;gap:0}
+.step{display:flex;gap:14px;position:relative;padding-bottom:18px}
+.step:not(:last-child)::before{content:"";position:absolute;left:15px;top:32px;bottom:0;width:2px;background:var(--line)}
+.step.done:not(:last-child)::before{background:var(--green-line)}
+.step-ic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:14px;z-index:1;border:2px solid var(--line);background:var(--surface);color:var(--ink-faint)}
+.step.done .step-ic{background:var(--green);border-color:var(--green);color:#fff}
+.step.cur .step-ic{background:var(--ocre);border-color:var(--ocre);color:#fff}
+.step.no .step-ic{background:var(--oxblood);border-color:var(--oxblood);color:#fff}
+.step-m{flex:1;min-width:0;padding-top:3px}
+.step-t{font-size:13.5px;font-weight:600}
+.step-s{font-size:12px;color:var(--ink-faint);margin-top:2px}
+.step-c{font-size:12px;color:var(--ink-soft);margin-top:5px;background:var(--surface-2);border-radius:8px;padding:7px 10px;border:1px solid var(--line-2)}
+.step.warn .step-c{background:var(--ocre-bg);border-color:#ecdcc0;color:var(--ocre)}
+
+.dw-acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.act-approve{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--green);color:#fff;border-radius:11px;padding:13px;font-size:14px;font-weight:600}
+.act-approve:hover{filter:brightness(1.06)}
+.act-reject{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px solid var(--line);color:var(--oxblood);border-radius:11px;padding:13px 18px;font-size:14px;font-weight:600}
+.act-reject:hover{background:var(--oxblood-bg);border-color:var(--oxblood)}
+.act-bc{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--acajou);color:#fff;border-radius:11px;padding:13px;font-size:14px;font-weight:600}
+.act-bc:hover{background:var(--acajou-d)}
+.cmt-box{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;font-family:var(--sans);resize:vertical;min-height:60px;margin-bottom:10px}
+.cmt-box:focus{outline:none;border-color:var(--acajou);box-shadow:0 0 0 3px var(--parch)}
+
+/* MODAL */
+.modal-pos{position:fixed;inset:0;background:rgba(40,28,22,.46);display:none;align-items:flex-start;justify-content:center;padding:40px 20px;z-index:60;overflow-y:auto}
+.modal-pos.open{display:flex}
+.modal{width:100%;max-width:680px;background:var(--surface);border-radius:18px;box-shadow:var(--shadow-lg);overflow:hidden;animation:pop .18s}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.modal-h{padding:20px 24px;border-bottom:1px solid var(--line)}
+.modal-h h2{font-family:var(--serif);font-size:20px;font-weight:600}
+.modal-h p{font-size:13px;color:var(--ink-faint);margin-top:3px}
+.modal-b{padding:20px 24px;max-height:62vh;overflow-y:auto}
+.modal-f{padding:16px 24px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:10px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13.5px;background:var(--surface);color:var(--ink)}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--acajou);box-shadow:0 0 0 3px var(--parch)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn-cancel{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:11px 18px;font-size:13.5px;font-weight:600;color:var(--ink-soft)}
+.btn-save{background:var(--acajou);color:#fff;border-radius:10px;padding:11px 20px;font-size:13.5px;font-weight:600}
+.btn-save:hover{background:var(--acajou-d)}
+.lrow{display:grid;grid-template-columns:1fr 70px 110px 110px 30px;gap:8px;align-items:center;margin-bottom:8px}
+.lrow input{padding:8px 10px;font-size:13px}
+.lrow .lr-rm{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--oxblood)}
+.lrow .lr-rm:hover{background:var(--oxblood-bg)}
+.lrow-h{display:grid;grid-template-columns:1fr 70px 110px 110px 30px;gap:8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);margin-bottom:6px;padding:0 2px}
+.add-line{display:flex;align-items:center;gap:7px;color:var(--acajou);font-size:13px;font-weight:600;padding:8px 0;margin-top:4px}
+.modal-total{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:2px solid var(--line);font-size:15px}
+.modal-total b{font-family:var(--mono);font-size:18px}
+
+/* toast */
+.toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{background:var(--acajou-d);color:#fff;padding:12px 20px;border-radius:11px;font-size:13.5px;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:9px;animation:tin .2s}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* recent activity */
+.act-i{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--line-2)}
+.act-i:last-child{border-bottom:none}
+.act-av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:600;flex:none}
+.act-m{flex:1;font-size:13px;line-height:1.5}
+.act-m b{font-weight:600}
+.act-time{font-size:11px;color:var(--ink-faint);font-family:var(--mono);flex:none}
+
+@media(max-width:760px){.shell{grid-template-columns:1fr}.sidebar{display:none}.kpis{grid-template-columns:1fr}.lrow,.lrow-h{grid-template-columns:1fr 50px 90px 30px}.lrow .lr-pu{display:none}.lrow-h span:nth-child(4){display:none}}
+
+/* ===== cycle de vie (macro-stepper) ===== */
+.cycle{display:flex;align-items:flex-start;margin:4px 0 2px}
+.cyc{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;text-align:center}
+.cyc:not(:last-child)::after{content:"";position:absolute;top:13px;left:50%;width:100%;height:2px;background:var(--line);z-index:0}
+.cyc.done:not(:last-child)::after{background:var(--green-line)}
+.cyc-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:700;background:var(--surface);border:2px solid var(--line);color:var(--ink-faint);z-index:1}
+.cyc.done .cyc-dot{background:var(--green);border-color:var(--green);color:#fff}
+.cyc.cur .cyc-dot{background:var(--ocre);border-color:var(--ocre);color:#fff;box-shadow:0 0 0 4px var(--ocre-bg)}
+.cyc.no .cyc-dot{background:var(--oxblood);border-color:var(--oxblood);color:#fff}
+.cyc-l{font-size:9.5px;color:var(--ink-soft);line-height:1.2;max-width:62px;font-weight:500}
+.cyc.cur .cyc-l{color:var(--ocre);font-weight:700}
+.cyc.done .cyc-l{color:var(--ink)}
+.bc-sec{background:var(--surface-2);margin:0 -24px;padding:16px 24px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+
+/* ===== impression du bon de commande ===== */
+#printArea{display:none}
+@media print{
+ body.printing>*:not(#printArea){display:none!important}
+ body.printing #printArea{display:block!important}
+ @page{margin:18mm}
+}
+.pr-doc{font-family:var(--sans);color:#1a1a1a;max-width:760px;margin:0 auto;padding:10px}
+.pr-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--acajou);padding-bottom:16px;margin-bottom:22px}
+.pr-org{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--acajou);letter-spacing:.02em}
+.pr-subt{font-size:12px;color:#555;margin-top:3px}
+.pr-bc{text-align:right;font-size:11px;letter-spacing:.1em;color:#555;line-height:1.5}
+.pr-id{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--acajou);letter-spacing:0}
+.pr-meta{display:flex;justify-content:space-between;gap:30px;font-size:13px;line-height:1.6;margin-bottom:22px}
+.pr-lab{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--acajou);font-weight:700;margin-bottom:4px}
+.pr-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:18px}
+.pr-tbl th{text-align:left;background:var(--acajou);color:#fff;padding:9px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.pr-tbl th:not(:first-child),.pr-tbl td:not(:first-child){text-align:right;font-family:var(--mono)}
+.pr-tbl td{padding:9px 12px;border-bottom:1px solid #e3dccf}
+.pr-tbl tfoot td{font-weight:700;border-top:2px solid var(--acajou);border-bottom:none;font-size:14px;padding-top:11px}
+.pr-obj{font-size:13px;margin-bottom:34px}
+.pr-sign{display:flex;justify-content:space-between;gap:40px;margin-top:30px}
+.pr-sg{flex:1;font-size:12px;color:#555}
+.pr-sg span{display:block;border-top:1px solid #999;margin-top:46px}
+
+/* ===== pièces jointes & devis ===== */
+.pieces{display:flex;flex-direction:column;gap:6px}
+.piece{display:flex;align-items:center;gap:9px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px}
+.piece .pc-ic{color:var(--taupe);display:grid}
+.piece .pc-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.piece .pc-s{color:var(--ink-faint);font-size:11px;font-family:var(--mono)}
+.dv-ret{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-soft);white-space:nowrap;justify-self:center}
+.dv-ret input{width:auto;margin:0}
+.bclink{cursor:pointer;text-decoration:underline}
+</style></head><body><div id="app"></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer"></aside>
+<div class="modal-pos" id="modalPos"><div class="modal" id="modal"></div></div>
+<div class="toast-wrap" id="toastWrap"></div>
+<script>window.__LOGO="data:image/png;base64,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";</script>
+<script>/* ============================================================
+   CRADESC — Demandes de paiement
+   Soumission → vérification budgétaire → approbation multiniveaux
+   → ordonnancement → décaissement → clôture.
+   ============================================================ */
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const LOGO=window.__LOGO||'';
+const TODAY='2026-06-11';
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ini=n=>n.split(' ').filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+const fcfa=n=>(Math.round(n||0)).toLocaleString('fr-FR').replace(/\u202f/g,' ')+' FCFA';
+const fM=n=>(n/1e6).toLocaleString('fr-FR',{maximumFractionDigits:1})+' M';
+function addDays(d,n){const t=new Date(d+'T00:00:00');t.setDate(t.getDate()+n);return t.toISOString().slice(0,10);}
+function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/86400000);}
+function dShort(d){if(!d)return '—';const[y,m,j]=d.split('-');return j+'/'+m;}
+function dLong(d){if(!d)return '—';const[y,m,j]=d.split('-');const M=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];return +j+' '+M[+m-1]+' '+y;}
+function toast(msg){const w=$('#toastWrap');const t=document.createElement('div');t.className='toast';t.innerHTML='<span>✦</span>'+esc(msg);w.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},2600);}
+function svg(p,sz){return `<svg width="${sz||18}" height="${sz||18}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="${p}"/></svg>`;}
+const IC={dash:'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z',
+ dp:'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6',
+ check:'M9 12l2 2 4-4M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20',
+ wallet:'M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 10h18M16 14h2',
+ bank:'M3 21h18M5 21V10M19 21V10M3 10l9-6 9 6M9 21v-7M15 21v-7',
+ policy:'M9 12l2 2 4-4M12 2 4 5v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V5z',
+ journal:'M12 8v4l3 3M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20',
+ indic:'M3 3v18h18M7 14l3-4 3 3 4-6',
+ plus:'M12 5v14M5 12h14',search:'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-4-4',
+ x:'M6 6l12 12M18 6 6 18',alert:'M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z',
+ chevron:'M9 6l6 6-6 6',clip:'M21.44 11.05l-9.19 9.19a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a1.5 1.5 0 0 1-2.12-2.12l8.49-8.49',
+ export:'M12 3v12M8 11l4 4 4-4M4 21h16',exec:'M5 13l4 4L19 7'};
+
+/* ---------- agents & rôles ---------- */
+const AGENTS=[
+ {id:'ag1',name:'Aïssatou Ndiaye',role:'admin',color:'#4A2E25'},
+ {id:'ag8',name:'Fatima Diallo',role:'directrice',color:'#9B3B2E'},
+ {id:'ag2',name:'Cheikh Fall',role:'dir_prog',prog:'PRG-DESC',color:'#9A6B22'},
+ {id:'ag4',name:'Mamadou Sow',role:'chef_projet',prog:'PRG-GOUV',proj:'PRJ-FISC',color:'#3a5a78'},
+ {id:'ag5',name:'Khady Touré',role:'chef_projet',prog:'PRG-DESC',proj:'PRJ-LOG',color:'#4E6B52'},
+ {id:'ag6',name:'Ibrahima Gueye',role:'collaborateur',prog:'PRG-GOUV',color:'#5E5A74'},
+ {id:'ag7',name:'Fatou Diop',role:'collaborateur',prog:'PRG-DESC',color:'#7A6962'},
+];
+let ME='ag8';
+const ROLE_LBL={admin:'Administratrice',directrice:'Directrice',dir_prog:'Directeur de programme',chef_projet:'Chef·fe de projet',collaborateur:'Agent'};
+const agent=id=>AGENTS.find(a=>a.id===id);
+const aName=id=>{const a=agent(id);return a?a.name:id;};
+const meRole=()=>agent(ME).role;
+function av(id,cls){const a=agent(id);if(!a)return '';return `<span class="${cls||'av'}" style="background:${a.color}">${ini(a.name)}</span>`;}
+
+/* ---------- budgets ---------- */
+const PROGRAMMES=[
+ {id:'PRG-DESC',name:'Droits ESC & justice sociale',color:'#9A6B22',budget:48000000,conso:24800000},
+ {id:'PRG-GOUV',name:'Gouvernance & finances publiques',color:'#3a5a78',budget:39000000,conso:18700000},
+ {id:'PRG-RENF',name:'Renforcement société civile',color:'#4E6B52',budget:34000000,conso:11200000},
+ {id:'PRG-FONC',name:'Fonctionnement & support',color:'#5E5A74',budget:22000000,conso:9400000},
+];
+const PROJETS=[
+ {id:'PRJ-LOG',progId:'PRG-DESC',name:'Droit au logement — Dakar'},
+ {id:'PRJ-EAU',progId:'PRG-DESC',name:'Eau & santé — Matam'},
+ {id:'PRJ-FISC',progId:'PRG-GOUV',name:'Justice fiscale'},
+ {id:'PRJ-DEF',progId:'PRG-RENF',name:'Protection des défenseur·e·s'},
+];
+const prog=id=>PROGRAMMES.find(p=>p.id===id);
+const proj=id=>PROJETS.find(p=>p.id===id);
+
+/* ---------- circuit de validation ---------- */
+const SEUILS=[{max:500000,chain:['hier','budget']},{max:2000000,chain:['hier','budget','prog']},{max:5000000,chain:['hier','budget','prog','dir']},{max:Infinity,chain:['hier','budget','prog','dir','bail']}];
+const STEP_DEF={hier:{label:'Validation hiérarchique',role:'chef_projet',sub:'Chef·fe de projet'},budget:{label:'Vérification budgétaire',role:'auto',sub:'Contrôle automatique'},prog:{label:'Directeur·trice de programme',role:'dir_prog',sub:'Validation programme'},dir:{label:'Direction',role:'directrice',sub:'Approbation direction'},bail:{label:'Approbation bailleur',role:'bailleur',sub:'Contrôle bailleur'}};
+function chainFor(m){return (SEUILS.find(s=>m<=s.max)||SEUILS[SEUILS.length-1]).chain;}
+function buildCircuit(m){return chainFor(m).map(k=>({key:k,state:'pending',who:null,date:null,comment:''}));}
+function actorMatches(key){const role=STEP_DEF[key].role,r=meRole();if(r==='admin')return true;if(role==='chef_projet')return ['chef_projet','dir_prog','directrice'].includes(r);if(role==='dir_prog')return ['dir_prog','directrice'].includes(r);if(role==='directrice')return r==='directrice';if(role==='bailleur')return r==='directrice';return false;}
+
+/* ---------- demandes de paiement ---------- */
+const TYPES_DP={fournisseur:'Paiement fournisseur',salaire:'Salaire / honoraires',note_frais:'Note de frais',avance:'Avance sur mission',autre:'Autre décaissement'};
+const TYPE_IC={fournisseur:'🧾',salaire:'👤',note_frais:'🧮',avance:'✈️',autre:'💳'};
+const MODES={virement:'Virement bancaire',cheque:'Chèque',especes:'Espèces'};
+const DP_ST={brouillon:['Brouillon','slate'],validation:['En validation','ocre'],approuvee:['Approuvée','blue'],ordonnance:['Ordonnancée','blue'],payee:['Payée · clôturée','green'],rejetee:['Rejetée','ox']};
+let DSEQ=0;const DEMANDES=[];
+function dpMontant(d){return d.montant;}
+function curStep(d){return d.circuit.find(s=>s.state==='pending');}
+function canActOn(d){if(d.status!=='validation')return false;const s=curStep(d);return s?actorMatches(s.key):false;}
+function engaged(progId,excl){let s=0;DEMANDES.forEach(d=>{if(d.progId===progId&&d!==excl&&d.type!=='avance'&&['approuvee','ordonnance','payee'].includes(d.status))s+=d.montant;});return s;}
+let OTHER_ENG={};
+function budgetAvail(progId,excl){const p=prog(progId);return p?p.budget-p.conso-engaged(progId,excl)-(OTHER_ENG[progId]||0):0;}
+function normalize(d){if(d.status==='brouillon'||d.status==='rejetee')return;
+ let s;while((s=d.circuit.find(x=>x.state==='pending'))&&STEP_DEF[s.key].role==='auto'){const av=budgetAvail(d.progId,d),fit=av>=d.montant;
+   s.state='approved';s.who='Système';s.date=TODAY;s.fit=fit;s.comment=fit?'Disponibilité budgétaire confirmée ('+fcfa(av)+' restant).':'⚠ Dépassement de '+fcfa(d.montant-av)+' — arbitrage direction requis.';}
+ if(d.circuit.some(x=>x.state==='rejected'))d.status='rejetee';
+ else if(d.circuit.every(x=>x.state==='approved')){if(!['approuvee','ordonnance','payee'].includes(d.status))d.status='approuvee';if(!d.valDate)d.valDate=TODAY;}
+ else d.status='validation';}
+function mkDP(o,approvedUpto,rejectAt){const id='DP-'+String(++DSEQ).padStart(3,'0');
+ const d=Object.assign({id,date:o.date||TODAY,created:o.created||TODAY,mode:'virement',pieces:[],ref:'',echeance:addDays(o.created||TODAY,10),valDate:null,status:'validation'},o);
+ d.circuit=buildCircuit(d.montant);let h=0;
+ for(const s of d.circuit){if(STEP_DEF[s.key].role==='auto')continue;
+   if(rejectAt!==undefined&&h===rejectAt){s.state='rejected';s.who=aName('ag2');s.date=TODAY;s.comment='Justificatif manquant — joindre la facture acquittée.';break;}
+   if(h<approvedUpto){s.state='approved';s.who=aName(STEP_DEF[s.key].role==='dir_prog'?'ag2':STEP_DEF[s.key].role==='directrice'?'ag8':'ag5');s.date=o.created||TODAY;s.comment='Approuvé.';h++;}else h++;}
+ if(o.brouillon){d.status='brouillon';d.circuit.forEach(s=>{s.state='pending';s.who=null;s.date=null;s.comment='';});}else normalize(d);
+ DEMANDES.push(d);return d;}
+
+/* ---------- seed ---------- */
+mkDP({type:'fournisseur',beneficiaire:'Sahel Bureautique SARL',montant:180000,progId:'PRG-GOUV',motif:"Règlement du bon de commande BC-001 — fournitures de bureau T3.",ref:'Facture FAC-001 · BC-001',created:addDays(TODAY,-8),pieces:[{name:'Facture_FAC-001.pdf',size:'84 Ko'}]},2);
+mkDP({type:'fournisseur',beneficiaire:'Imprimerie Dakaroise',montant:600000,progId:'PRG-DESC',motif:"Impression des rapports semestriels ESC.",ref:'Facture FAC-014',created:addDays(TODAY,-3),pieces:[{name:'Facture_ImprimDak.pdf',size:'120 Ko'}]},1);
+mkDP({type:'note_frais',beneficiaire:'Khady Touré',montant:145000,progId:'PRG-DESC',projId:'PRJ-LOG',motif:"Remboursement frais de terrain — enquêtes expulsions (3 jours).",created:addDays(TODAY,-2),pieces:[{name:'Recus_terrain.pdf',size:'56 Ko'}]},0);
+mkDP({type:'salaire',beneficiaire:'Consultant·e — Étude fiscale',montant:1200000,progId:'PRG-GOUV',projId:'PRJ-FISC',motif:"Honoraires consultant — première tranche étude justice fiscale.",ref:'Contrat CT-2026-07',created:addDays(TODAY,-4),pieces:[{name:'Contrat_CT-2026-07.pdf',size:'210 Ko'}]},2);
+mkDP({type:'avance',beneficiaire:'Cheikh Fall',montant:2400000,progId:'PRG-DESC',projId:'PRJ-EAU',motif:"Avance de frais — caravane de sensibilisation Matam (mission OM-002).",ref:'Mission OM-002',created:addDays(TODAY,-1),pieces:[]},1);
+mkDP({type:'fournisseur',beneficiaire:'Téranga Events & Hôtellerie',montant:1490000,progId:'PRG-DESC',projId:'PRJ-LOG',motif:"Logistique atelier multi-acteurs (restitution étude).",ref:'BC-002',created:addDays(TODAY,-5),pieces:[{name:'Facture_Teranga.pdf',size:'98 Ko'}]},3);
+mkDP({type:'autre',beneficiaire:'SENELEC',montant:320000,progId:'PRG-FONC',motif:"Facture d'électricité — locaux CRADESC (T2).",created:addDays(TODAY,-2),pieces:[]},0,1);
+// DP-001 déjà approuvée -> ordonnancée pour la démo
+(function(){const d=DEMANDES[0];if(d.status==='approuvee'){d.status='ordonnance';d.ordDate=TODAY;}})();
+
+/* ---------- audit ---------- */
+const AUDIT=[];
+function audit(action,target){AUDIT.unshift({who:aName(ME),role:ROLE_LBL[meRole()],action,target:target||'',ts:TODAY+' '+new Date().toTimeString().slice(0,5),ds:dShort(TODAY)});if(AUDIT.length>200)AUDIT.length=200;}
+
+/* ---------- export ---------- */
+function csvCell(v){v=String(v==null?'':v);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function downloadCSV(name,header,rows){const lines=[header].concat(rows).map(r=>r.map(csvCell).join(';')).join('\r\n');const blob=new Blob(['\ufeff'+lines],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);audit('a exporté',name);toast('Export : '+name);}
+function exportDP(){downloadCSV('CRADESC_paiements_'+TODAY+'.csv',['Réf','Type','Bénéficiaire','Programme','Montant FCFA','Mode','Statut','Échéance','Référence'],DEMANDES.map(d=>[d.id,TYPES_DP[d.type],d.beneficiaire,prog(d.progId).name,d.montant,MODES[d.mode],DP_ST[d.status][0],d.echeance,d.ref||'']));}
+
+/* ============================================================ RENDU ============================================================ */
+const NAV=[['dash','Vue d\'ensemble',IC.dash],['list','Demandes',IC.dp],['valid','À approuver',IC.check],['tresor','Décaissements',IC.bank],['indic','Indicateurs',IC.indic],['policy','Politique',IC.policy],['journal','Journal',IC.journal]];
+const TITLES={dash:['Vue d\'ensemble','Pilotage des décaissements'],list:['Demandes de paiement','Soumission et suivi des décaissements'],valid:['À approuver','Demandes en attente de votre décision'],tresor:['Décaissements','Ordonnancement et exécution des paiements'],indic:['Indicateurs','Performance et conformité des paiements'],policy:['Politique','Seuils et circuit d\'approbation'],journal:['Journal d\'activité','Traçabilité des actions']};
+let state={module:'dash',filter:'all',scope:'all',q:''};
+function myValidCount(){return DEMANDES.filter(canActOn).length;}
+function tresorCount(){return ['admin','directrice'].includes(meRole())?DEMANDES.filter(d=>['approuvee','ordonnance'].includes(d.status)).length:0;}
+function renderApp(){
+ $('#app').innerHTML=`<div class="shell">
+   <aside class="sidebar"><div class="sb-brand"><div class="sb-logo"><img src="${LOGO}" alt="CRADESC"></div><div><b>CRADESC</b><span>PAIEMENTS</span></div></div>
+     <nav class="sb-nav" id="nav"></nav>
+     <div class="sb-foot"><button class="me-menu" id="meBtn"><span class="me-av" style="background:${agent(ME).color}">${ini(aName(ME))}</span><div><b>${esc(aName(ME))}</b><span>${ROLE_LBL[meRole()]}</span></div></button></div></aside>
+   <div class="main"><header class="topbar"><div class="tb-t"><h1 id="pgTitle"></h1><p id="pgSub"></p></div><div class="tb-spacer"></div>
+     <div class="tb-search"><span style="display:grid">${svg(IC.search,15)}</span><input id="search" placeholder="Rechercher…"></div>
+     <button class="btn-primary" id="newDP">${svg(IC.plus,15)}<span>Nouvelle demande</span></button></header>
+     <div class="view" id="view"></div></div></div>`;
+ renderNav();render();$('#newDP').onclick=()=>newDPModal();$('#meBtn').onclick=meMenu;
+ $('#search').oninput=e=>{state.q=e.target.value;if(['list','tresor'].includes(state.module))render();};
+}
+function renderNav(){
+ $('#nav').innerHTML=NAV.map(([k,l,ic])=>{const n=k==='valid'?myValidCount():k==='tresor'?tresorCount():0;
+   return `<button class="navit ${state.module===k?'on':''}" data-nav="${k}">${svg(ic)}<span>${l}</span>${n?`<span class="nb">${n}</span>`:''}</button>`;}).join('');
+ $$('#nav [data-nav]').forEach(b=>b.onclick=()=>{state.module=b.dataset.nav;render();renderNav();});
+}
+function render(){const t=TITLES[state.module];$('#pgTitle').textContent=t[0];$('#pgSub').textContent=t[1];
+ ({dash:renderDash,list:renderList,valid:renderValid,tresor:renderTresor,indic:renderIndic,policy:renderPolicy,journal:renderJournal}[state.module]||renderDash)($('#view'));}
+
+function kpiBox(l,n,s,ic,c,bg){return `<div class="kpi"><div class="kpi-h"><span class="kpi-l">${l}</span><span class="kpi-ic" style="background:${bg};color:${c}">${svg(ic,17)}</span></div><div class="kpi-n">${n}</div><div class="kpi-s">${s}</div></div>`;}
+function qcard(d){const s=curStep(d);return `<div class="qcard"><div class="q-ic">${TYPE_IC[d.type]}</div><div class="q-m"><div class="q-t">${esc(d.beneficiaire)}</div><div class="q-s">${d.id} · ${TYPES_DP[d.type]} · ${esc(prog(d.progId).name)} · étape : ${STEP_DEF[s.key].label}</div></div><div class="q-amt">${fcfa(d.montant)}</div><div class="q-acts"><button class="btn-ok" data-app="${d.id}">${svg(IC.check,14)}Approuver</button><button class="btn-no" data-rej="${d.id}">Rejeter</button></div></div>`;}
+function wireQcards(){$$('#view .qcard .q-m,#view .qcard .q-ic').forEach(e=>e.onclick=()=>{const c=e.closest('.qcard');const id=(c.querySelector('[data-app]')||{}).dataset?.app;if(id)openDP(id);});
+ $$('#view [data-app]').forEach(b=>b.onclick=e=>{e.stopPropagation();doApprove(b.dataset.app);});
+ $$('#view [data-rej]').forEach(b=>b.onclick=e=>{e.stopPropagation();doReject(b.dataset.rej);});}
+
+function renderDash(v){
+ const enValid=DEMANDES.filter(d=>d.status==='validation').length;const mine=myValidCount();
+ const aDecaisser=DEMANDES.filter(d=>['approuvee','ordonnance'].includes(d.status)).length;
+ const decaisse=DEMANDES.filter(d=>d.status==='payee').reduce((s,d)=>s+d.montant,0);
+ const queue=DEMANDES.filter(canActOn);
+ v.innerHTML=`<div class="kpis">
+   ${kpiBox('À approuver par vous',mine,'En attente de décision',IC.check,'var(--ocre)','var(--ocre-bg)')}
+   ${kpiBox('En validation',enValid,'Circuits en cours',IC.dp,'var(--blue)','var(--blue-bg)')}
+   ${kpiBox('À décaisser',aDecaisser,'Approuvées non payées',IC.bank,'var(--slate)','var(--slate-bg)')}
+   ${kpiBox('Décaissé',fM(decaisse),'Total payé',IC.wallet,'var(--green)','var(--green-bg)')}
+ </div>
+ <div class="grid2"><div>
+   <div class="panel"><div class="panel-h"><h3>À approuver par vous</h3>${queue.length?'<button class="btn-ghost" data-go="valid">Tout voir</button>':''}</div><div class="panel-b">${queue.length?queue.slice(0,4).map(qcard).join(''):`<div class="empty"><div class="e-ic">${svg(IC.check,24)}</div><b>Rien à approuver</b>Aucune demande n'attend votre décision.</div>`}</div></div>
+   <div class="panel"><div class="panel-h"><h3>Activité récente</h3></div><div class="panel-b">${AUDIT.slice(0,6).map(a=>`<div class="act-i"><span class="act-av" style="background:${agent(ME).color}">${ini(a.who)}</span><div class="act-m"><b>${esc(a.who)}</b> ${esc(a.action)} <b>${esc(a.target)}</b></div><span class="act-time">${esc(a.ds)}</span></div>`).join('')||'<div class="faint" style="padding:10px 0;font-size:13px">Aucune action.</div>'}</div></div>
+ </div><div>
+   <div class="panel"><div class="panel-h"><h3>Disponibilité budgétaire</h3></div><div class="panel-b">${PROGRAMMES.map(p=>{const eng=engaged(p.id);const used=p.conso+eng;const pct=Math.min(100,Math.round(used/p.budget*100));const col=pct>90?'var(--oxblood)':pct>75?'var(--ocre)':'var(--green)';return `<div class="budg-row"><div class="budg-top"><b>${esc(p.name)}</b><span class="mono">${pct}%</span></div><div class="bbar"><i style="width:${pct}%;background:${col}"></i></div><div class="budg-meta">Disponible ${fcfa(p.budget-used)} · engagé ${fcfa(eng)}</div></div>`;}).join('')}</div></div>
+   <div class="panel"><div class="panel-h"><h3>À décaisser</h3></div><div class="panel-b">${DEMANDES.filter(d=>['approuvee','ordonnance'].includes(d.status)).slice(0,4).map(d=>`<div class="act-i" data-dp="${d.id}" style="cursor:pointer"><span class="act-av" style="background:var(--acajou)">${TYPE_IC[d.type]}</span><div class="act-m"><b>${esc(d.beneficiaire)}</b><div class="faint" style="font-size:11.5px">${d.id} · ${fcfa(d.montant)}</div></div><span class="pill ${DP_ST[d.status][1]}">${DP_ST[d.status][0]}</span></div>`).join('')||'<div class="faint" style="padding:10px 0;font-size:13px">Rien à décaisser.</div>'}</div></div>
+ </div></div>`;
+ $$('#view [data-go]').forEach(b=>b.onclick=()=>{state.module=b.dataset.go;render();renderNav();});
+ $$('#view [data-dp]').forEach(b=>b.onclick=()=>openDP(b.dataset.dp));wireQcards();
+}
+function circMini(d){return `<span class="circ-mini">${d.circuit.map(s=>`<span class="circ-dot ${s.state==='approved'?'ok':s.state==='rejected'?'no':s.state==='pending'&&s===curStep(d)?'cur':''}"></span>`).join('')}</span>`;}
+function renderList(v){
+ let list=DEMANDES.slice();if(state.scope==='mine')list=list.filter(d=>d.demandeur===ME);if(state.filter!=='all')list=list.filter(d=>d.status===state.filter);
+ if(state.q)list=list.filter(d=>(d.beneficiaire+' '+d.id+' '+d.motif).toLowerCase().includes(state.q.toLowerCase()));
+ v.innerHTML=`<div class="filters"><div class="seg"><button class="${state.scope==='all'?'on':''}" data-scope="all">Toutes</button><button class="${state.scope==='mine'?'on':''}" data-scope="mine">Mes demandes</button></div>
+   <select id="fStatus"><option value="all">Tous les statuts</option>${Object.entries(DP_ST).map(([k,vv])=>`<option value="${k}" ${state.filter===k?'selected':''}>${vv[0]}</option>`).join('')}</select>
+   <div class="tb-spacer"></div><button class="btn-ghost" id="exp">${svg(IC.export,15)}Exporter CSV</button></div>
+ <div class="panel"><table class="tbl"><thead><tr><th>Réf.</th><th>Bénéficiaire</th><th>Type</th><th>Programme</th><th>Circuit</th><th style="text-align:right">Montant</th><th>Statut</th></tr></thead>
+ <tbody>${list.map(d=>`<tr data-dp="${d.id}"><td><span class="req-id">${d.id}</span></td><td><b style="font-weight:600">${esc(d.beneficiaire)}</b></td><td>${TYPE_IC[d.type]} ${TYPES_DP[d.type]}${d.source==='mission'?' <span class="pill blue">mission</span>':''}</td><td>${esc(prog(d.progId).name)}</td><td>${circMini(d)}</td><td class="num">${fcfa(d.montant)}</td><td><span class="pill ${DP_ST[d.status][1]} dot">${DP_ST[d.status][0]}</span></td></tr>`).join('')||`<tr><td colspan="7"><div class="empty"><div class="e-ic">${svg(IC.dp,24)}</div><b>Aucune demande</b>Crée une demande de paiement pour démarrer.</div></td></tr>`}</tbody></table></div>`;
+ $$('#view [data-scope]').forEach(b=>b.onclick=()=>{state.scope=b.dataset.scope;render();});
+ $('#fStatus').onchange=e=>{state.filter=e.target.value;render();};$('#exp').onclick=exportDP;
+ $$('#view tr[data-dp]').forEach(tr=>tr.onclick=()=>openDP(tr.dataset.dp));
+}
+function renderValid(v){const queue=DEMANDES.filter(canActOn);
+ v.innerHTML=queue.length?`<div class="page-head"><p>${queue.length} demande(s) attendent votre décision, selon le circuit d'approbation.</p></div>${queue.map(qcard).join('')}`:`<div class="empty"><div class="e-ic">${svg(IC.check,26)}</div><b>Tout est à jour</b>Aucune demande n'attend votre approbation.</div>`;wireQcards();}
+function renderTresor(v){const can=['admin','directrice'].includes(meRole());
+ let list=DEMANDES.filter(d=>['approuvee','ordonnance','payee'].includes(d.status));if(state.q)list=list.filter(d=>(d.beneficiaire+' '+d.id).toLowerCase().includes(state.q.toLowerCase()));
+ v.innerHTML=`<div class="page-head"><p>Ordonnancement puis exécution des paiements approuvés.${can?'':' (Réservé à la direction.)'}</p></div>
+ <div class="panel"><table class="tbl"><thead><tr><th>Réf.</th><th>Bénéficiaire</th><th>Mode</th><th>Échéance</th><th style="text-align:right">Montant</th><th>Statut</th><th></th></tr></thead>
+ <tbody>${list.map(d=>{let act='';if(can){if(d.status==='approuvee')act=`<button class="btn-ok" data-ord="${d.id}">Ordonnancer</button>`;else if(d.status==='ordonnance')act=`<button class="btn-ok" data-pay="${d.id}">Exécuter</button>`;}
+   return `<tr data-dp="${d.id}"><td><span class="req-id">${d.id}</span></td><td><b style="font-weight:600">${esc(d.beneficiaire)}</b></td><td>${MODES[d.mode]}</td><td>${dShort(d.echeance)}</td><td class="num">${fcfa(d.montant)}</td><td><span class="pill ${DP_ST[d.status][1]} dot">${DP_ST[d.status][0]}</span></td><td style="text-align:right">${act}</td></tr>`;}).join('')||`<tr><td colspan="7"><div class="empty"><div class="e-ic">${svg(IC.bank,24)}</div><b>Rien à décaisser</b>Les paiements approuvés apparaîtront ici.</div></td></tr>`}</tbody></table></div>`;
+ $$('#view [data-ord]').forEach(b=>b.onclick=e=>{e.stopPropagation();ordonnancer(b.dataset.ord);});
+ $$('#view [data-pay]').forEach(b=>b.onclick=e=>{e.stopPropagation();executer(b.dataset.pay);});
+ $$('#view tr[data-dp]').forEach(tr=>tr.onclick=()=>openDP(tr.dataset.dp));
+}
+function renderIndic(v){
+ const validated=DEMANDES.filter(d=>d.valDate);const delais=validated.map(d=>daysBetween(d.created,d.valDate)).filter(n=>n>=0);
+ const delaiMoy=delais.length?Math.round(delais.reduce((a,b)=>a+b,0)/delais.length):0;
+ const respect=validated.length?Math.round(validated.filter(d=>!d.circuit.some(s=>s.key==='budget'&&s.fit===false)).length/validated.length*100):100;
+ const decaisse=DEMANDES.filter(d=>d.status==='payee').reduce((s,d)=>s+d.montant,0);
+ const enCours=DEMANDES.filter(d=>['validation','approuvee','ordonnance'].includes(d.status)).reduce((s,d)=>s+d.montant,0);
+ const byT={};DEMANDES.forEach(d=>{byT[d.type]=(byT[d.type]||0)+d.montant;});const maxT=Math.max(1,...Object.values(byT));
+ const byS={};DEMANDES.forEach(d=>{byS[d.status]=(byS[d.status]||0)+1;});const maxS=Math.max(1,...Object.values(byS));
+ const colMap={green:'var(--green)',ocre:'var(--ocre)',ox:'var(--oxblood)',slate:'var(--slate)',blue:'var(--blue)'};
+ v.innerHTML=`<div class="kpis">
+   ${kpiBox('Délai moyen d\'approbation',delaiMoy+' j','Soumission → approbation',IC.journal,'var(--blue)','var(--blue-bg)')}
+   ${kpiBox('Conformité budgétaire',respect+' %','Dans l\'enveloppe',IC.check,'var(--green)','var(--green-bg)')}
+   ${kpiBox('Encours à payer',fM(enCours),'En circuit + approuvé',IC.dp,'var(--ocre)','var(--ocre-bg)')}
+   ${kpiBox('Décaissé',fM(decaisse),'Total exécuté',IC.wallet,'var(--green)','var(--green-bg)')}
+ </div><div class="grid2">
+   <div class="panel"><div class="panel-h"><h3>Décaissements par type</h3></div><div class="panel-b">${Object.entries(TYPES_DP).filter(([k])=>byT[k]).map(([k,l])=>`<div class="budg-row"><div class="budg-top"><b>${TYPE_IC[k]} ${l}</b><span class="mono">${fcfa(byT[k])}</span></div><div class="bbar"><i style="width:${Math.round(byT[k]/maxT*100)}%;background:var(--acajou)"></i></div></div>`).join('')}</div></div>
+   <div class="panel"><div class="panel-h"><h3>Demandes par statut</h3></div><div class="panel-b">${Object.entries(DP_ST).filter(([k])=>byS[k]).map(([k,vv])=>`<div class="budg-row"><div class="budg-top"><b>${vv[0]}</b><span class="mono">${byS[k]}</span></div><div class="bbar"><i style="width:${Math.round(byS[k]/maxS*100)}%;background:${colMap[vv[1]]}"></i></div></div>`).join('')}</div></div>
+ </div>`;
+}
+function renderPolicy(v){const ranges=[['≤ 500 000 FCFA',['hier','budget']],['500 001 – 2 000 000',['hier','budget','prog']],['2 000 001 – 5 000 000',['hier','budget','prog','dir']],['> 5 000 000',['hier','budget','prog','dir','bail']]];
+ v.innerHTML=`<div class="page-head"><p>Le circuit d'approbation d'une demande de paiement dépend de son montant, après vérification automatique de la disponibilité budgétaire.</p></div>
+ <div class="panel"><div class="panel-h"><h3>Seuils & circuit d'approbation</h3></div><div class="panel-b" style="padding:6px 20px 8px">${ranges.map(([amt,chain])=>`<div class="policy-step"><div class="ps-amt">${amt}</div><div class="ps-chain">${chain.map((k,i)=>`${i?`<span class="ps-arrow">${svg(IC.chevron,13)}</span>`:''}<span class="ps-node">${STEP_DEF[k].role==='auto'?svg(IC.policy,13):''}${STEP_DEF[k].label}</span>`).join('')}</div></div>`).join('')}</div></div>
+ <div class="panel"><div class="panel-h"><h3>Règles</h3></div><div class="panel-b" style="padding:14px 20px 18px">
+   <div class="kv"><span class="k">Justificatifs</span><span class="v">Facture ou pièce probante obligatoire avant ordonnancement</span></div>
+   <div class="kv"><span class="k">Vérification budgétaire</span><span class="v">Automatique avant l'approbation finale</span></div>
+   <div class="kv"><span class="k">Séparation des tâches</span><span class="v">Approbation et décaissement assurés par des rôles distincts</span></div>
+   <div class="kv"><span class="k">Délai cible</span><span class="v">Traitement sous 10 jours ouvrés après soumission</span></div>
+ </div></div>`;
+}
+function renderJournal(v){v.innerHTML=`<div class="panel"><div class="panel-b">${AUDIT.length?AUDIT.map(a=>`<div class="act-i"><span class="act-av" style="background:var(--taupe)">${ini(a.who)}</span><div class="act-m"><b>${esc(a.who)}</b> ${esc(a.action)} <b>${esc(a.target)}</b><div class="faint" style="font-size:11.5px">${esc(a.role)} · ${esc(a.ts)}</div></div></div>`).join(''):`<div class="empty"><div class="e-ic">${svg(IC.journal,24)}</div><b>Journal vide</b></div>`}</div></div>`;}
+
+/* ---------- drawer ---------- */
+function openDrawer(html){$('#drawer').innerHTML=html;$('#scrim').classList.add('open');$('#drawer').classList.add('open');$('#drawer').scrollTop=0;}
+function closeDrawer(){$('#scrim').classList.remove('open');$('#drawer').classList.remove('open');}
+$('#scrim')&&($('#scrim').onclick=closeDrawer);
+function cycleStages(d){return [
+ {label:'Demande',done:true},
+ {label:'Validation',done:['approuvee','ordonnance','payee'].includes(d.status),cur:d.status==='validation',no:d.status==='rejetee'},
+ {label:'Ordonnancement',done:['ordonnance','payee'].includes(d.status),cur:d.status==='approuvee'},
+ {label:'Décaissement',done:d.status==='payee',cur:d.status==='ordonnance'},
+ {label:'Clôture',done:d.status==='payee'},
+];}
+function macroStepper(d){return `<div class="cycle">${cycleStages(d).map((s,i)=>`<div class="cyc ${s.no?'no':s.done?'done':s.cur?'cur':''}"><div class="cyc-dot">${s.no?'✕':s.done?'✓':i+1}</div><div class="cyc-l">${s.label}</div></div>`).join('')}</div>`;}
+function openDP(id){const d=DEMANDES.find(x=>x.id===id);if(!d)return;const p=prog(d.progId);const avb=budgetAvail(d.progId,d);const fit=avb>=d.montant;const s=curStep(d);const can=canActOn(d);
+ const body=`<div class="dw-head"><div class="dw-bar"><span class="dw-key">${d.id}</span><span class="pill ${DP_ST[d.status][1]} dot">${DP_ST[d.status][0]}</span><span class="pill slate">${TYPE_IC[d.type]} ${TYPES_DP[d.type]}</span>${d.source==='mission'?'<span class="pill blue">via mission</span>':''}<button class="dw-x" id="dwX">${svg(IC.x,18)}</button></div>
+   <div class="dw-title">${esc(d.beneficiaire)}</div><div class="dw-sub">${fcfa(d.montant)} · ${MODES[d.mode]} · échéance ${dLong(d.echeance)}</div></div>
+ <div class="dw-body">
+   <div class="section"><div class="sec-h">Cycle de la demande</div>${macroStepper(d)}</div>
+   <div class="section"><div class="sec-h">Rattachement & objet</div>
+     <div class="kv"><span class="k">Programme</span><span class="v" style="color:${p.color};font-weight:600">${esc(p.name)}</span></div>
+     ${d.projId?`<div class="kv"><span class="k">Projet</span><span class="v">${esc(proj(d.projId).name)}</span></div>`:''}
+     ${d.ref?`<div class="kv"><span class="k">Référence</span><span class="v">${esc(d.ref)}</span></div>`:''}
+     <div class="kv"><span class="k">Demandeur</span><span class="v">${esc(aName(d.demandeur||ME))}</span></div>
+     <div style="font-size:13.5px;color:var(--ink-soft);margin-top:8px">${esc(d.motif)}</div></div>
+   <div class="section"><div class="sec-h">Vérification budgétaire automatique</div>
+     <div class="budgctl ${fit?'ok':'no'}"><div class="bc-top">${svg(fit?IC.check:IC.alert,16)}${fit?'Disponibilité confirmée':'Dépassement du disponible'}</div>
+       <div class="bc-grid"><div class="bcg"><b class="mono">${fcfa(avb)}</b><span>Disponible sur le programme</span></div><div class="bcg"><b class="mono">${fcfa(d.montant)}</b><span>Montant demandé</span></div></div></div></div>
+   ${d.pieces&&d.pieces.length?`<div class="section"><div class="sec-h">Justificatifs</div><div class="pieces">${d.pieces.map(x=>`<div class="piece"><span class="pc-ic">${svg(IC.clip,13)}</span><span class="pc-n">${esc(x.name)}</span><span class="pc-s">${esc(x.size||'')}</span></div>`).join('')}</div></div>`:`<div class="section"><div class="sec-h">Justificatifs</div><div class="faint" style="font-size:13px">Aucune pièce jointe.</div></div>`}
+   <div class="section"><div class="sec-h">Circuit d'approbation</div><div class="stepper">${d.circuit.map(st=>{const dd=STEP_DEF[st.key];const cls=st.state==='approved'?'done':st.state==='rejected'?'no':(st===s?'cur':'');const warn=st.key==='budget'&&st.fit===false;
+     return `<div class="step ${cls} ${warn?'warn':''}"><div class="step-ic">${st.state==='approved'?'✓':st.state==='rejected'?'✕':(dd.role==='auto'?'⚙':'')}</div><div class="step-m"><div class="step-t">${dd.label}</div><div class="step-s">${st.who?esc(st.who)+(st.date?' · '+dShort(st.date):''):dd.sub}</div>${st.comment?`<div class="step-c">${esc(st.comment)}</div>`:''}</div></div>`;}).join('')}</div></div>
+   ${dpActions(d,can)}
+ </div>`;
+ openDrawer(body);$('#dwX').onclick=closeDrawer;
+ if($('#aSubmit'))$('#aSubmit').onclick=()=>{d.status='validation';normalize(d);audit('a soumis la demande',d.id);toast('Demande soumise au circuit');renderNav();render();openDP(d.id);};
+ if($('#aApprove'))$('#aApprove').onclick=()=>doApprove(d.id,($('#aCmt')||{}).value);
+ if($('#aReject'))$('#aReject').onclick=()=>doReject(d.id,($('#aCmt')||{}).value);
+ if($('#aOrd'))$('#aOrd').onclick=()=>ordonnancer(d.id);
+ if($('#aExec'))$('#aExec').onclick=()=>executer(d.id);
+}
+function dpActions(d,can){
+ if(d.status==='brouillon'&&d.demandeur===ME)return `<div class="dw-acts"><button class="act-bc" id="aSubmit">${svg(IC.check,16)}Soumettre</button></div>`;
+ if(can)return `<div class="section"><div class="sec-h">Votre décision — ${esc(STEP_DEF[curStep(d).key].label)}</div><textarea class="cmt-box" id="aCmt" placeholder="Commentaire (facultatif)…"></textarea><div class="dw-acts"><button class="act-approve" id="aApprove">${svg(IC.check,16)}Approuver</button><button class="act-reject" id="aReject">Rejeter</button></div></div>`;
+ const canT=['admin','directrice'].includes(meRole());
+ if(d.status==='approuvee')return `<div class="dw-acts">${canT?`<button class="act-bc" id="aOrd">${svg(IC.bank,15)}Ordonnancer le paiement</button>`:'<div class="faint" style="font-size:13px">Approuvée — en attente d\'ordonnancement par la trésorerie.</div>'}</div>`;
+ if(d.status==='ordonnance')return `<div class="dw-acts">${canT?`<button class="act-approve" id="aExec">${svg(IC.exec,15)}Exécuter le décaissement</button>`:'<div class="faint" style="font-size:13px">Ordonnancée — en attente d\'exécution.</div>'}</div>`;
+ if(d.status==='payee')return `<div class="dw-acts"><span class="pill green" style="padding:9px 14px;align-self:center">✓ Payée · clôturée le ${dShort(d.payDate)}</span></div>`;
+ return '';
+}
+function doApprove(id,c){const d=DEMANDES.find(x=>x.id===id);const s=curStep(d);if(!s||!actorMatches(s.key))return;s.state='approved';s.who=aName(ME);s.date=TODAY;s.comment=c&&c.trim()?c.trim():'Approuvé.';normalize(d);audit('a approuvé',d.id+' · '+STEP_DEF[s.key].label);toast('Demande approuvée'+(d.status==='approuvee'?' — circuit terminé':''));renderNav();render();if($('#drawer').classList.contains('open'))openDP(id);}
+function doReject(id,c){const d=DEMANDES.find(x=>x.id===id);const s=curStep(d);if(!s||!actorMatches(s.key))return;s.state='rejected';s.who=aName(ME);s.date=TODAY;s.comment=c&&c.trim()?c.trim():'Rejetée.';d.status='rejetee';audit('a rejeté',d.id);toast('Demande rejetée');renderNav();render();if($('#drawer').classList.contains('open'))openDP(id);}
+function ordonnancer(id){const d=DEMANDES.find(x=>x.id===id);if(!['admin','directrice'].includes(meRole())||d.status!=='approuvee')return;d.status='ordonnance';d.ordDate=TODAY;audit('a ordonnancé le paiement',d.id);toast('Paiement ordonnancé');renderNav();render();if($('#drawer').classList.contains('open'))openDP(id);}
+function executer(id){const d=DEMANDES.find(x=>x.id===id);if(!['admin','directrice'].includes(meRole())||d.status!=='ordonnance')return;d.status='payee';d.payDate=TODAY;audit('a exécuté le décaissement',d.id+' · '+fcfa(d.montant));toast('Décaissement exécuté — demande clôturée');renderNav();render();if($('#drawer').classList.contains('open'))openDP(id);}
+
+/* ---------- modal création ---------- */
+function openModal(html){$('#modal').innerHTML=html;$('#modalPos').classList.add('open');}
+function closeModal(){$('#modalPos').classList.remove('open');}
+let dpPieces=[];
+function newDPModal(){dpPieces=[];
+ openModal(`<div class="modal-h"><h2>Nouvelle demande de paiement</h2><p>Renseigne le bénéficiaire, le montant, le rattachement budgétaire et les justificatifs.</p></div>
+ <div class="modal-b">
+   <div class="frow"><div class="field"><label>Type</label><select id="nType">${Object.entries(TYPES_DP).map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></div>
+     <div class="field"><label>Mode de paiement</label><select id="nMode">${Object.entries(MODES).map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select></div></div>
+   <div class="field"><label>Bénéficiaire</label><input id="nBenef" placeholder="Nom du fournisseur, de l'agent…"></div>
+   <div class="frow"><div class="field"><label>Programme</label><select id="nProg">${PROGRAMMES.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div>
+     <div class="field"><label>Projet (facultatif)</label><select id="nProj"><option value="">—</option>${PROJETS.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div></div>
+   <div class="frow"><div class="field"><label>Montant (FCFA)</label><input id="nMontant" type="number" min="0" step="1000" value="0"></div>
+     <div class="field"><label>Échéance souhaitée</label><input id="nEch" type="date" value="${addDays(TODAY,10)}"></div></div>
+   <div class="field"><label>Référence (facture, BC, contrat…)</label><input id="nRef" placeholder="Ex. Facture FAC-014 · BC-002"></div>
+   <div class="field"><label>Motif</label><textarea id="nMotif" rows="2" placeholder="Objet du paiement…"></textarea></div>
+   <div id="budgPrev"></div>
+   <div class="field" style="margin-top:14px"><label>Justificatifs</label><input type="file" id="nFiles" multiple style="font-size:12.5px"><div id="piecesBox" style="margin-top:8px"></div></div>
+ </div>
+ <div class="modal-f"><button class="btn-cancel" id="mCancel">Annuler</button><button class="btn-save" id="mSubmit">Soumettre la demande</button></div>`);
+ paintPieces();updateBudg();
+ $('#nMontant').oninput=updateBudg;$('#nProg').onchange=updateBudg;
+ $('#nFiles').onchange=e=>{[...e.target.files].forEach(f=>dpPieces.push({name:f.name,size:(f.size/1024).toFixed(0)+' Ko'}));paintPieces();e.target.value='';};
+ $('#mCancel').onclick=closeModal;$('#mSubmit').onclick=submitDP;
+}
+function paintPieces(){const box=$('#piecesBox');if(!box)return;box.innerHTML=dpPieces.map((p,i)=>`<div class="piece"><span class="pc-ic">${svg(IC.clip,13)}</span><span class="pc-n">${esc(p.name)}</span><span class="pc-s">${esc(p.size||'')}</span><button class="lr-rm" data-prm="${i}" style="width:24px;height:24px">${svg(IC.x,13)}</button></div>`).join('');$$('#piecesBox [data-prm]').forEach(b=>b.onclick=()=>{dpPieces.splice(+b.dataset.prm,1);paintPieces();});}
+function updateBudg(){const m=+($('#nMontant').value)||0;const pid=$('#nProg').value;const av=budgetAvail(pid);const fit=av>=m;const chain=chainFor(m);
+ $('#budgPrev').innerHTML=`<div class="budgctl ${fit?'ok':'no'}" style="margin-top:6px"><div class="bc-top">${svg(fit?IC.check:IC.alert,15)}${fit?'Disponibilité confirmée':'Dépassement prévisible'} · circuit : ${chain.map(k=>STEP_DEF[k].label.split(' ')[0]).join(' › ')}</div><div class="bc-grid"><div class="bcg"><b class="mono">${fcfa(av)}</b><span>Disponible</span></div><div class="bcg"><b class="mono">${fcfa(m)}</b><span>Demandé</span></div></div></div>`;}
+function submitDP(){const benef=$('#nBenef').value.trim();const m=+($('#nMontant').value)||0;
+ if(!benef){toast('Indique un bénéficiaire');return;}if(m<=0){toast('Indique un montant');return;}
+ if(!dpPieces.length&&['fournisseur','note_frais','salaire'].includes($('#nType').value)){toast('Joins au moins un justificatif (facture, reçu, contrat)');return;}
+ const id='DP-'+String(++DSEQ).padStart(3,'0');
+ const d={id,type:$('#nType').value,beneficiaire:benef,montant:m,progId:$('#nProg').value,projId:$('#nProj').value||null,mode:$('#nMode').value,echeance:$('#nEch').value,ref:$('#nRef').value.trim(),motif:$('#nMotif').value.trim(),demandeur:ME,created:TODAY,date:TODAY,pieces:dpPieces.slice(),valDate:null,status:'validation'};
+ d.circuit=buildCircuit(m);normalize(d);DEMANDES.unshift(d);audit('a créé la demande de paiement',id);closeModal();toast('Demande '+id+' soumise au circuit');state.module='list';render();renderNav();openDP(id);}
+
+/* ---------- changement d'utilisateur ---------- */
+function meMenu(){openModal(`<div class="modal-h"><h2>Changer d'utilisateur</h2><p>Pour visualiser droits et circuits selon le profil.</p></div>
+ <div class="modal-b">${AGENTS.map(a=>`<button class="qcard" data-me="${a.id}" style="width:100%;cursor:pointer;${a.id===ME?'border-color:var(--acajou)':''}"><span class="me-av" style="background:${a.color};width:40px;height:40px">${ini(a.name)}</span><div class="q-m"><div class="q-t">${esc(a.name)}</div><div class="q-s">${ROLE_LBL[a.role]}</div></div>${a.id===ME?'<span class="pill green">Actif</span>':''}</button>`).join('')}</div>
+ <div class="modal-f"><button class="btn-cancel" id="mCancel">Fermer</button></div>`);
+ $('#mCancel').onclick=closeModal;$$('#modal [data-me]').forEach(b=>b.onclick=()=>{ME=b.dataset.me;closeModal();closeDrawer();renderApp();toast('Connecté·e : '+aName(ME));});}
+
+/* ---------- ingestion des avances transmises par le module Missions ---------- */
+function ingestAvances(avances){let added=0;(avances||[]).forEach(av=>{const dup=DEMANDES.some(d=>d.id===av.ref||(d.ref&&av.omRef&&d.ref.indexOf(av.omRef)>=0));if(dup)return;
+   const d={id:av.ref,type:'avance',beneficiaire:av.beneficiaire,montant:av.montant,progId:av.progId,projId:av.projId||null,mode:'virement',echeance:av.echeance||addDays(TODAY,7),ref:'Mission '+av.omRef,motif:av.motif||('Avance de frais — mission '+av.omRef),demandeur:ME,created:TODAY,date:TODAY,pieces:[],valDate:TODAY,status:'approuvee',source:'mission'};
+   d.circuit=buildCircuit(d.montant);d.circuit.forEach(s=>{s.state='approved';s.who='Workflow missions';s.date=TODAY;s.comment='Validée via l\'ordre de mission '+av.omRef+'.';});
+   DEMANDES.unshift(d);added++;});
+ if(added){try{renderNav();render();}catch(e){}}
+ return added;}
+const APP='paiements';
+function openByRef(ref){if(!ref)return;if(/^DP-/.test(ref))return openDP(ref);}
+function applyContext(msg){let ch=false;
+ if(msg.session&&msg.session.agentId&&agent(msg.session.agentId)){ME=msg.session.agentId;ch=true;}
+ if(msg.engagements){OTHER_ENG={};Object.keys(msg.engagements).forEach(dom=>{if(dom===APP)return;const m=msg.engagements[dom]||{};Object.keys(m).forEach(pg=>OTHER_ENG[pg]=(OTHER_ENG[pg]||0)+m[pg]);});ch=true;}
+ if(ch)renderApp();
+ if(msg.focus)setTimeout(()=>openByRef(msg.focus),40);}
+window.addEventListener('message',e=>{const d=e.data;if(!d)return;if(d.type==='cradesc-bus')ingestAvances(d.avances);if(d.type==='cradesc-context')applyContext(d);if(d.type==='cradesc-focus')openByRef(d.ref);});
+renderApp();
+try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'cradesc-ready',app:APP},'*');}catch(e){}
+</script></body></html>

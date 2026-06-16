@@ -1,0 +1,20 @@
+{
+  "indexes": [
+    { "collectionGroup": "taches", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "responsableId", "order": "ASCENDING" },
+      { "fieldPath": "echeance", "order": "ASCENDING" } ] },
+    { "collectionGroup": "demandesPaiement", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "statut", "order": "ASCENDING" },
+      { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "requisitions", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "progId", "order": "ASCENDING" },
+      { "fieldPath": "statut", "order": "ASCENDING" } ] },
+    { "collectionGroup": "ordresMission", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "agentId", "order": "ASCENDING" },
+      { "fieldPath": "statut", "order": "ASCENDING" } ] },
+    { "collectionGroup": "decisions", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "statut", "order": "ASCENDING" },
+      { "fieldPath": "echeance", "order": "ASCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}
