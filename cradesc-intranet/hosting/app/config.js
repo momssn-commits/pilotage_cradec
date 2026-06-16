@@ -20,8 +20,21 @@ export const firebaseConfig = {
   appId: "__APP_ID__",
 };
 
-/* Domaine professionnel autorisé (cf. Dossier technique §4). */
-export const DOMAINE_AUTORISE = "cradesc.org";
+/* ----- Identité / accès -----
+   Sans nom de domaine, la connexion Google (popup OAuth) est refusée par
+   Google sur une IP nue : on utilise donc l'authentification e-mail + mot de
+   passe par défaut. Google reste disponible et s'activera dès qu'un nom de
+   domaine HTTPS sera en place (METHODE_AUTH = "google").
+
+   METHODE_AUTH : "password" (défaut, marche sans domaine) | "google"
+   SUPER_ADMIN_EMAIL : compte super-administrateur (rôle admin posé au boot).
+   DOMAINES_AUTORISES : [] = aucune restriction de domaine ; sinon liste blanche.
+*/
+export const METHODE_AUTH = "password";
+export const SUPER_ADMIN_EMAIL = "momssn@gmail.com";
+export const DOMAINES_AUTORISES = []; // ex. ["cradesc.org"] pour restreindre
+/* Compat : ancien nom utilisé ailleurs. */
+export const DOMAINE_AUTORISE = DOMAINES_AUTORISES[0] || "";
 
 /* Région des Cloud Functions (cf. Dossier technique §14 — région des données). */
 export const FUNCTIONS_REGION = "europe-west1";

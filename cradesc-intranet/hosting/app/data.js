@@ -10,32 +10,21 @@
 import { DEMO } from "./config.js";
 import { initFirebase, sdk } from "./firebase.js";
 
-/* ---- Référentiels de démarrage (alignés sur les identifiants de la maquette) ---- */
+import { SUPER_ADMIN_EMAIL } from "./config.js";
+
+/* ---- Référentiels de démarrage ----
+   Aucune donnée de test : seul le super-administrateur est amorcé.
+   Les programmes / projets réels seront créés depuis l'application. */
 export const SEED = {
   agents: [
-    { id: "ag1", email: "a.ndiaye@cradesc.org", nom: "Aïssatou Ndiaye", role: "admin",        actif: true },
-    { id: "ag2", email: "c.fall@cradesc.org",   nom: "Cheikh Fall",     role: "dir_prog",     actif: true },
-    { id: "ag6", email: "n.mbaye@cradesc.org",  nom: "Nogaye Mbaye",    role: "collaborateur", actif: true },
-    { id: "ag8", email: "f.diallo@cradesc.org", nom: "Fatima Diallo",   role: "directrice",   actif: true },
+    { id: "admin", email: SUPER_ADMIN_EMAIL, nom: SUPER_ADMIN_EMAIL.split("@")[0], role: "admin", actif: true },
   ],
-  programmes: [
-    { id: "PRG-DESC", code: "PRG-DESC", intitule: "Droits ESC",            budgetTotal: 121000000, bailleur: "Fondation OSF" },
-    { id: "PRG-GOUV", code: "PRG-GOUV", intitule: "Gouvernance & redevabilité", budgetTotal: 64000000, bailleur: "UE" },
-    { id: "PRG-RENF", code: "PRG-RENF", intitule: "Renforcement de capacités",  budgetTotal: 28000000, bailleur: "AFD" },
-  ],
-  projets: [
-    { id: "prj1", programmeId: "PRG-DESC", intitule: "Étude expulsions forcées", responsableId: "ag2", periode: "2026" },
-    { id: "prj2", programmeId: "PRG-GOUV", intitule: "Justice fiscale",          responsableId: "ag2", periode: "2026" },
-  ],
+  programmes: [],
+  projets: [],
 };
 
-/* Engagements consolidés de référence transmis aux plateformes (par domaine,
-   pour éviter le double comptage côté plateforme — cf. shell de la maquette). */
-export const ENG_BASE = {
-  achats:    { "PRG-DESC": 1490000, "PRG-GOUV":  180000 },
-  paiements: { "PRG-DESC": 1490000, "PRG-GOUV": 1380000 },
-  missions:  { "PRG-DESC": 1575000, "PRG-GOUV": 1260000, "PRG-RENF": 680000 },
-};
+/* Engagements consolidés transmis aux plateformes (vides au démarrage réel). */
+export const ENG_BASE = { achats: {}, paiements: {}, missions: {} };
 
 /* ====================== Implémentation DÉMO ====================== */
 const LS_KEY = "cradesc_data_v1";

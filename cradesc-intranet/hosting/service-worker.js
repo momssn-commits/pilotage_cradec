@@ -1,7 +1,7 @@
 /* CRADESC — Service worker (PWA)
    Cache applicatif léger : coquille + styles. Les données restent en ligne
    (Firestore gère le mode hors-ligne nativement côté SDK). */
-const CACHE = "cradesc-shell-v1";
+const CACHE = "cradesc-shell-v2";
 const ASSETS = [
   "./", "./index.html", "./styles/shell.css",
   "./app/shell.js", "./app/ui.js", "./app/rbac.js", "./app/config.js",
@@ -15,14 +15,16 @@ self.addEventListener("install", e => {
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
+// Réseau d'abord (le code applicatif reste à jour), avec repli sur le cache
+// hors-ligne. On n'intercepte jamais Firebase/Google (autres origines).
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
-  if (e.request.method !== "GET" || url.origin !== location.origin) return;   // ne pas intercepter Firebase/Google
+  if (e.request.method !== "GET" || url.origin !== location.origin) return;
   e.respondWith(
-    caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
+    fetch(e.request).then(res => {
       const copy = res.clone();
       caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
       return res;
-    }).catch(() => caches.match("./index.html")))
+    }).catch(() => caches.match(e.request).then(hit => hit || caches.match("./index.html")))
   );
 });

@@ -8,7 +8,7 @@ import { LOGO } from "../assets/logo.js";
 import { $, $$, esc, ini, svg, IC, googleG, gappIcon, toast } from "./ui.js";
 import { DEMO, DOMAINE_AUTORISE } from "./config.js";
 import { APPS, GOOGLE_APPS, EMBEDDED, ROLE_LABEL, canAccess } from "./rbac.js";
-import { startAuth, currentSession, signInWithGoogle, loginDemo, signOut, DEMO_USERS } from "./auth.js";
+import { startAuth, currentSession, signInWithGoogle, signInWithPassword, authMethod, loginDemo, signOut } from "./auth.js";
 import { loadWorkspace } from "./google.js";
 import { initBus, setPendingFocus, sendContext } from "./bus.js";
 
@@ -44,39 +44,43 @@ function loadPrefs() {
 function renderLogin() {
   state.view = "login";
   $("#appFrame").classList.remove("open");
+  const formReal = authMethod === "google"
+    ? `<button class="g-btn" id="googleBtn">${googleG}<span>Se connecter avec Google</span></button>`
+    : `<form id="loginForm" class="login-form" autocomplete="on">
+         <label class="lf-field"><span>Adresse e-mail</span><input id="liEmail" type="email" name="email" autocomplete="username" placeholder="vous@exemple.org" required></label>
+         <label class="lf-field"><span>Mot de passe</span><input id="liPass" type="password" name="password" autocomplete="current-password" placeholder="••••••••" required></label>
+         <button class="g-btn" type="submit" id="pwBtn"><span>Se connecter</span></button>
+       </form>`;
   $("#app").innerHTML = `<div class="login-clean">
     <div class="lc-card">
       <div class="lc-logo"><img src="${LOGO}" alt="CRADESC"></div>
       <div class="lc-brand">CRADESC</div>
       <div class="lc-tag">INTRANET</div>
-      <div class="lc-welcome"><h1>Connexion</h1><p>Authentifiez-vous avec votre compte Google professionnel.</p></div>
-      <button class="g-btn" id="googleBtn">${googleG}<span>Se connecter avec Google</span></button>
+      <div class="lc-welcome"><h1>Connexion</h1><p>${DEMO ? "Mode démonstration — accès super-administrateur." : "Authentifiez-vous avec vos identifiants."}</p></div>
+      ${DEMO ? `<button class="g-btn" id="demoBtn"><span>Entrer (super-administrateur)</span></button>` : formReal}
       <div class="lc-secure">${svg(IC.shield, 15)}<span>Connexion sécurisée — aucun mot de passe n'est conservé côté CRADESC.</span></div>
-      ${DEMO ? `<div class="lc-demo">Mode démonstration — données simulées. Renseignez <code>app/config.js</code> pour activer Google&nbsp;Sign-In et Firestore.</div>` : ""}
+      ${DEMO ? `<div class="lc-demo">Données simulées. Renseignez <code>app/config.js</code> (config Firebase) pour passer en réel.</div>` : ""}
     </div>
     <div class="lc-foot">© 2026 CRADESC · Confidentiel · Réf. CC-CRADESC-2026-003</div>
   </div>`;
-  $("#googleBtn").onclick = DEMO ? openGoogleModal : doGoogleSignIn;
+  if (DEMO) { $("#demoBtn").onclick = () => { loginDemo(); toast("Connecté·e (démo)"); }; return; }
+  if (authMethod === "google") { $("#googleBtn").onclick = doGoogleSignIn; return; }
+  $("#loginForm").onsubmit = doPasswordSignIn;
 }
 
 async function doGoogleSignIn() {
   try { await signInWithGoogle(); }
   catch (e) { toast(e.message === "DEMO" ? "Mode démo actif" : (e.message || "Connexion impossible")); }
 }
-
-/* Démo : sélecteur de compte simulé (reproduit la modale Google). */
-function openGoogleModal() {
-  $("#gmodal").innerHTML = `<div class="gmodal">
-    <div class="gm-h">
-      <div class="gm-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="g">l</span><span class="r">e</span></div>
-      <h2>Choisir un compte</h2><p>pour continuer vers <b>CRADESC Intranet</b></p>
-    </div>
-    <div class="gm-accounts">${DEMO_USERS.map(u => `<button class="gm-acc" data-login="${u.uid}"><span class="gm-av" style="background:${u.color}">${ini(u.name)}</span><div><b>${esc(u.name)}</b><span>${esc(u.email)}</span></div></button>`).join("")}</div>
-    <div class="gm-foot">Pour continuer, Google partagera votre nom, votre adresse e-mail et votre photo de profil avec CRADESC Intranet.</div>
-  </div>`;
-  $("#gmodal").classList.add("open");
-  $$("#gmodal [data-login]").forEach(b => b.onclick = () => { $("#gmodal").classList.remove("open"); loginDemo(b.dataset.login); toast("Connecté·e via Google (démo)"); });
-  $("#gmodal").onclick = e => { if (e.target === $("#gmodal")) $("#gmodal").classList.remove("open"); };
+async function doPasswordSignIn(e) {
+  e.preventDefault();
+  const btn = $("#pwBtn"); btn.disabled = true;
+  try { await signInWithPassword($("#liEmail").value, $("#liPass").value); }
+  catch (err) {
+    const m = String(err && err.code || "");
+    toast(/invalid|wrong|not-found/.test(m) ? "E-mail ou mot de passe incorrect." : (err.message || "Connexion impossible"));
+    btn.disabled = false;
+  }
 }
 
 /* ============================================================
@@ -317,13 +321,9 @@ function wireShell() {
 function closeSidebar() { $("#sidebar").classList.remove("open"); $("#navScrim").classList.remove("open"); }
 
 function renderProfMenu() {
-  const accounts = DEMO
-    ? `<div class="pm-sec">Changer de compte (démo des droits)</div>${DEMO_USERS.map(u => `<button class="pm-acc ${u.uid === ME.uid ? "on" : ""}" data-su="${u.uid}"><span class="tb-av" style="background:${u.color};width:30px;height:30px;font-size:12px">${ini(u.name)}</span><div><b style="font-size:13px">${esc(u.name)}</b></div><span class="pm-tag">${esc(ROLE_LABEL[u.role])}</span></button>`).join("")}`
-    : "";
   $("#profMenu").innerHTML = `<div class="pm-h"><span class="tb-av" style="background:${ME.color}">${ini(ME.name)}</span><div><b>${esc(ME.name)}</b><span>${esc(ME.email)}</span></div></div>
-    ${accounts}
+    <div class="pm-sec">${esc(ME.roleLabel)}</div>
     <button class="pm-out" data-logout>${svg("M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9", 16)}Se déconnecter</button>`;
-  $$("#profMenu [data-su]").forEach(b => b.onclick = () => { loginDemo(b.dataset.su); });
   $("#profMenu [data-logout]").onclick = () => signOut();
 }
 

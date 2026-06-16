@@ -12,13 +12,22 @@ dossier. Le tout est intégré dans ce dépôt prêt à déployer.
 | | Mode démo (par défaut) | Mode réel |
 |---|---|---|
 | Déclenchement | `app/config.js` non renseigné, ou `?demo=1` | config renseignée, ou `?live=1`, ou émulateur |
-| Connexion | sélecteur de compte simulé (4 profils, 5 rôles) | **Google Sign-In** restreint à `@cradesc.org` |
-| Données | persistance locale (`localStorage`) + jeux de démo | **Cloud Firestore** |
+| Connexion | bouton « Entrer (super-administrateur) » | **e-mail + mot de passe** (Firebase Auth) |
+| Données | persistance locale (`localStorage`) | **Cloud Firestore** |
 | Actions sensibles | simulées en façade | **Cloud Functions** (`httpsCallable`) |
 | Aperçus Gmail/Agenda/Drive | données figées | API Google via Cloud Function |
 
+**Authentification (cf. `app/config.js`).** Par défaut `METHODE_AUTH="password"`
+(e-mail + mot de passe) : fonctionne **sans nom de domaine** (compatible IP nue).
+Google Sign-In (`METHODE_AUTH="google"`) exige un domaine HTTPS (Google refuse
+l'OAuth sur une IP) — à activer une fois un domaine en place. Le
+**super-administrateur** est `SUPER_ADMIN_EMAIL` (= `momssn@gmail.com`, rôle
+`admin`). Aucune donnée ni compte de test : seul le super-admin est amorcé
+(`functions/seed.js`).
+
 Le mode démo permet de **lancer et tester l'interface immédiatement**, sans
-compte Google. Le passage en réel ne demande que de **renseigner la config**.
+backend. Le passage en réel ne demande que de **renseigner la config** et de
+créer le super-admin (`functions/seed.js`).
 
 ## Lancer en mode démo
 

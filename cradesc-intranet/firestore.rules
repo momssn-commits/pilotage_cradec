@@ -9,9 +9,13 @@ service cloud.firestore {
     //  Rôles : admin · directrice · dir_prog · chef_projet · collaborateur
     // ============================================================
 
+    // Connecté = jeton Firebase valide. Les comptes sont créés explicitement
+    // (amorçage / admin) — pas d'inscription en libre-service. Une éventuelle
+    // restriction de domaine est appliquée à la création du compte
+    // (functions/src/roles.js). Pour la rappliquer ici, décommentez la ligne.
     function signedIn() {
-      return request.auth != null
-        && request.auth.token.email.matches('.*@cradesc[.]org');
+      return request.auth != null;
+      //   && request.auth.token.email.matches('.*@cradesc[.]org');
     }
     function role() { return request.auth.token.role; }
     function hasRole(roles) { return signedIn() && (role() in roles); }
